@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Trade | Smart Mobile Trade-In Platform</title>
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --accent: #a855f7;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius-lg: 18px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -100px; left: -100px; }
+        .glow-2 { bottom: -100px; right: -100px; }
+
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        main {
+            max-width: 800px;
+            width: 92%;
+            margin: 2.5rem auto;
+            flex-grow: 1;
+        }
+
+        .progress-box {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-track {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 14.28%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.3px;
+        }
+
+        p.subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        select option {
+            background: #0f172a;
+            color: white;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.85rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.85rem;
+        }
+
+        .option-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.1rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .option-box:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .option-box.selected {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .option-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .option-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checkbox-row:hover {
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .checkbox-row input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checkbox-row span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.6rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sec {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-sec:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-pri {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-pri:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .loader {
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 2.5rem auto 1.25rem;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .summary-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: white;
+            border-top: 1px solid var(--border);
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .payout-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            max-width: 340px;
+            margin: 1rem auto;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+
+        footer {
+            text-align: center;
+            padding: 1.25rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        @media(max-width: 650px) {
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            main {
+                width: 95%;
+                margin: 1.5rem auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header>
+        <div class="logo"><span class="logo-icon">⚡</span> Nexus Trade</div>
+        <div style="font-size: 0.8rem; color: var(--muted);">Mobile Valuation Platform</div>
+    </header>
+
+    <main>
+        <div class="progress-box">
+            <div class="progress-info">
+                <span id="step-title">Step 1 of 7: Device Information</span>
+                <span id="progress-pct">14%</span>
+            </div>
+            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+
+        <div class="card">
+            <!-- Step 1: Device Information -->
+            <section id="step-1">
+                <h2>Device Information</h2>
+                <p class="subtitle">Choose your manufacturer brand and model specifications.</p>
+                <div class="form-group">
+                    <label>Brand Manufacturer</label>
+                    <select id="brand-sel">
+                        <option value="" disabled selected>-- Select Brand --</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Realme">Realme</option>
+                        <option value="Redmi">Redmi</option>
+                        <option value="Google">Google</option>
+                        <option value="Oppo">Oppo</option>
+                        <option value="Motorola">Motorola</option>
+                        <option value="Vivo">Vivo</option>
+                        <option value="Poco">Poco</option>
+                        <option value="OnePlus">OnePlus</option>
+                        <option value="Nothing">Nothing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Device Model</label>
+                    <select id="model-sel">
+                        <option value="" disabled selected>-- Select brand first --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Storage Capacity Configuration</label>
+                    <div class="grid-3">
+                        <div class="option-box" onclick="selectOpt(this, 'storage', '128GB', 0)">
+                            <div class="option-title">128GB</div>
+                            <div class="option-desc">Base Variant</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'storage', '256GB', 40)">
+                            <div class="option-title">256GB</div>
+                            <div class="option-desc">+$40 (₹3,320)</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'storage', '512GB', 90)">
+                            <div class="option-title">512GB</div>
+                            <div class="option-desc">+$90 (₹7,470)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Usage Duration -->
+            <section id="step-2" class="hidden">
+                <h2>Usage Duration</h2>
+                <p class="subtitle">How many years have you used this smartphone?</p>
+                <div class="grid-2">
+                    <div class="option-box" onclick="selectOpt(this, 'years', 'Less than 1 year', 20)">
+                        <div class="option-title">Less than 1 Year</div>
+                        <div class="option-desc">Like new condition bonus (+$20 / ₹1,660)</div>
+                    </div>
+                    <div class="option-box" onclick="selectOpt(this, 'years', '1 to 2 years', 0)">
+                        <div class="option-title">1 to 2 Years</div>
+                        <div class="option-desc">Standard depreciation</div>
+                    </div>
+                    <div class="option-box" onclick="selectOpt(this, 'years', '2 to 3 years', -40)">
+                        <div class="option-title">2 to 3 Years</div>
+                        <div class="option-desc">Moderate wear (-$40 / -₹3,320)</div>
+                    </div>
+                    <div class="option-box" onclick="selectOpt(this, 'years', 'More than 3 years', -80)">
+                        <div class="option-title">3+ Years</div>
+                        <div class="option-desc">Higher depreciation (-$80 / -₹6,640)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Condition Assessment -->
+            <section id="step-3" class="hidden">
+                <h2>Condition Assessment</h2>
+                <p class="subtitle">Accurately select current device screen and chassis health.</p>
+                <div class="form-group">
+                    <label>Screen Integrity</label>
+                    <div class="grid-3">
+                        <div class="option-box" onclick="selectOpt(this, 'screen', 0, 0)">
+                            <div class="option-title">Flawless</div>
+                            <div class="option-desc">Zero marks</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'screen', 50, 1)">
+                            <div class="option-title">Scratched</div>
+                            <div class="option-desc">Normal use</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'screen', 120, 2)">
+                            <div class="option-title">Cracked</div>
+                            <div class="option-desc">Shattered glass</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label>Body Housing</label>
+                    <div class="grid-3">
+                        <div class="option-box" onclick="selectOpt(this, 'body', 0, 0)">
+                            <div class="option-title">Pristine</div>
+                            <div class="option-desc">Like new</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'body', 30, 1)">
+                            <div class="option-title">Scuffed</div>
+                            <div class="option-desc">Edge wear</div>
+                        </div>
+                        <div class="option-box" onclick="selectOpt(this, 'body', 70, 2)">
+                            <div class="option-title">Dented</div>
+                            <div class="option-desc">Frame wear</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Specification Records -->
+            <section id="step-4" class="hidden">
+                <h2>Specification Records</h2>
+                <p class="subtitle">Enter device validation serial references and diagnostics.</p>
+                <div class="form-group">
+                    <label>IMEI / Serial Reference</label>
+                    <input type="text" id="imei" placeholder="e.g. 358920194827104 (Dial *#06#)">
+                </div>
+                <div class="form-group">
+                    <label>Hardware Functionality Checks</label>
+                    <label class="checkbox-row"><input type="checkbox" id="c1"> <span>Device powers on normally without boot loops.</span></label>
+                    <label class="checkbox-row"><input type="checkbox" id="c2"> <span>Cameras, microphones, and biometrics fully operational.</span></label>
+                </div>
+            </section>
+
+            <!-- Step 5: Valuation Rules Engine -->
+            <section id="step-5" class="hidden text-center">
+                <h2>Valuation Rules Engine</h2>
+                <p class="subtitle">Computing live market parameters and hardware deductions...</p>
+                <div id="loader" class="loader"></div>
+                <div id="results" class="summary-box hidden">
+                    <div class="summary-row"><span>Base Market Value:</span> <span id="r-base">$0</span></div>
+                    <div class="summary-row"><span>Storage Upgrade Bonus:</span> <span id="r-storage" style="color:var(--success)">+$0</span></div>
+                    <div class="summary-row"><span>Age & Condition Deductions:</span> <span id="r-deduct" style="color:var(--danger)">-$0</span></div>
+                    <div class="summary-row total"><span>Final Guaranteed Payout:</span> <span id="r-final" style="color:var(--primary)">$0</span></div>
+                </div>
+            </section>
+
+            <!-- Step 6: Offer Generation -->
+            <section id="step-6" class="hidden text-center">
+                <h2>Offer Generation</h2>
+                <p class="subtitle">Valuation secured and locked for the next 7 days.</p>
+                <div class="payout-card">
+                    <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--primary);">Guaranteed Offer</div>
+                    <div id="offer-price" style="font-size: 2.1rem; font-weight: 800; margin: 6px 0;">$0</div>
+                    <div id="offer-device" style="font-size: 0.8rem; color: var(--muted);">No device selected</div>
+                </div>
+                <div style="max-width: 320px; margin: 0 auto; text-align: left;">
+                    <label>Payout Option & Cashback Promotion</label>
+                    <select>
+                        <option>Google Pay (+$15 / ₹1,245 Cashback Bonus)</option>
+                        <option>PhonePe (+$10 / ₹830 Instant Cashback)</option>
+                        <option>Paytm Wallet (+5% Extra Cashback)</option>
+                        <option>Direct Bank Wire Transfer</option>
+                        <option>PayPal Instant Payout</option>
+                        <option>Store Credit (+20% Trade-in Bonus)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Step 7: Customer Acceptance -->
+            <section id="step-7" class="hidden text-center">
+                <div style="font-size: 3.2rem; margin-bottom: 0.5rem;">🎉</div>
+                <h2>Trade-In Agreement Registered</h2>
+                <p class="subtitle">Prepaid courier shipping waybill dispatched to your email.</p>
+                <div style="background: rgba(15,23,42,0.8); border: 1px dashed var(--border); padding: 1.1rem; border-radius: var(--radius-sm); max-width: 280px; margin: 1.25rem auto; font-family: monospace;">
+                    Tracking ID: <strong style="color: var(--success)">NEXUS-2026-8894</strong>
+                </div>
+                <button class="btn btn-sec" onclick="resetAll()">Initiate New Assessment</button>
+            </section>
+
+            <!-- Navigation Controls -->
+            <div id="nav-footer" class="btn-row">
+                <button id="btn-back" class="btn btn-sec hidden" onclick="navigate(-1)">Back</button>
+                <div style="margin-left: auto;">
+                    <button id="btn-next" class="btn btn-pri" onclick="navigate(1)">Continue Assessment</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>&copy; 2026 Nexus Trade Platform. Built for presentation.</footer>
+
+    <script>
+        let step = 1, maxSteps = 7;
+        let data = { brand: '', model: '', storage: '', bonus: 0, ageYears: '', ageAdjustment: 0, screen: -1, body: -1, base: 0 };
+        const conversionRate = 83; // 1 USD = 83 INR approximate conversion factor
+
+        const catalog = {
+            'Apple': ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 13', 'iPhone 12', 'iPhone 11', 'iPhone SE (3rd Gen)'],
+            'Samsung': ['Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24', 'Galaxy S23 Ultra', 'Galaxy S23+', 'Galaxy Z Fold5', 'Galaxy Z Flip5', 'Galaxy A54 5G', 'Galaxy A34 5G', 'Galaxy S21 FE'],
+            'Realme': ['Realme GT 5 Pro', 'Realme GT 3', 'Realme 11 Pro+', 'Realme 11 Pro', 'Realme 10 Pro+', 'Realme Narzo 60 Pro', 'Realme GT Neo 3', 'Realme 9 Pro+', 'Realme C55', 'Realme 9i'],
+            'Redmi': ['Redmi Note 13 Pro+', 'Redmi Note 13 Pro', 'Redmi Note 13', 'Redmi K60 Pro', 'Redmi Note 12 Pro+', 'Redmi Note 12', 'Redmi 13C', 'Redmi A2+', 'Redmi Note 11 Pro', 'Redmi 10 Prime'],
+            'Google': ['Pixel 8 Pro', 'Pixel 8', 'Pixel 7a', 'Pixel 7 Pro', 'Pixel 7', 'Pixel 6a', 'Pixel 6 Pro', 'Pixel 6', 'Pixel 5', 'Pixel 4a'],
+            'Oppo': ['Oppo Find X7 Ultra', 'Oppo Find N3', 'Oppo Reno 11 Pro', 'Oppo Reno 10 Pro+', 'Oppo Find X5 Pro', 'Oppo Reno 8', 'Oppo A78', 'Oppo A58', 'Oppo F23 Pro', 'Oppo Reno 7'],
+            'Motorola': ['Moto Edge 50 Pro', 'Moto Razr 40 Ultra', 'Moto Edge 40', 'Moto G84 5G', 'Moto G54 5G', 'Moto Edge 30 Ultra', 'Moto G73', 'Moto One 5G', 'Moto G62', 'Moto E13'],
+            'Vivo': ['Vivo X100 Pro', 'Vivo X90 Pro', 'Vivo V30 Pro', 'Vivo V29', 'Vivo X80 Pro', 'Vivo T2 Pro', 'Vivo Y200', 'Vivo V27', 'Vivo Y100', 'Vivo Y35'],
+            'Poco': ['Poco F6 Pro', 'Poco X6 Pro', 'Poco X6', 'Poco F5', 'Poco X5 Pro', 'Poco M6 Pro', 'Poco C65', 'Poco F4 GT', 'Poco X4 Pro', 'Poco M5'],
+            'OnePlus': ['OnePlus 12', 'OnePlus 12R', 'OnePlus Open', 'OnePlus 11', 'OnePlus 11R', 'OnePlus 10 Pro', 'OnePlus 10T', 'OnePlus Nord 3', 'OnePlus Nord CE 3', 'OnePlus 9 Pro'],
+            'Nothing': ['Nothing Phone (2)', 'Nothing Phone (1)', 'Nothing Phone (2a)', 'Nothing Ear (2)', 'Nothing Ear (open)', 'Nothing Phone (2) Special', 'Nothing Phone (1) Alpha', 'Nothing Concept 1', 'Nothing OS Edition', 'Nothing Watch Pro']
+        };
+
+        const prices = {
+            'iPhone 15 Pro Max': 890, 'iPhone 15 Pro': 720, 'iPhone 15 Plus': 610, 'iPhone 15': 550, 'iPhone 14 Pro Max': 680, 'iPhone 14 Pro': 540, 'iPhone 13': 370, 'iPhone 12': 280, 'iPhone 11': 190, 'iPhone SE (3rd Gen)': 160,
+            'Galaxy S24 Ultra': 810, 'Galaxy S24+': 650, 'Galaxy S24': 560, 'Galaxy S23 Ultra': 590, 'Galaxy S23+': 490, 'Galaxy Z Fold5': 720, 'Galaxy Z Flip5': 430, 'Galaxy A54 5G': 210, 'Galaxy A34 5G': 170, 'Galaxy S21 FE': 220,
+            'Realme GT 5 Pro': 400, 'Realme GT 3': 320, 'Realme 11 Pro+': 250, 'Realme 11 Pro': 210, 'Realme 10 Pro+': 180, 'Realme Narzo 60 Pro': 170, 'Realme GT Neo 3': 190, 'Realme 9 Pro+': 140, 'Realme C55': 90, 'Realme 9i': 70,
+            'Redmi Note 13 Pro+': 260, 'Redmi Note 13 Pro': 210, 'Redmi Note 13': 150, 'Redmi K60 Pro': 310, 'Redmi Note 12 Pro+': 180, 'Redmi Note 12': 120, 'Redmi 13C': 80, 'Redmi A2+': 50, 'Redmi Note 11 Pro': 110, 'Redmi 10 Prime': 60,
+            'Pixel 8 Pro': 520, 'Pixel 8': 400, 'Pixel 7a': 230, 'Pixel 7 Pro': 350, 'Pixel 7': 270, 'Pixel 6a': 180, 'Pixel 6 Pro': 220, 'Pixel 6': 150, 'Pixel 5': 110, 'Pixel 4a': 70,
+            'Oppo Find X7 Ultra': 600, 'Oppo Find N3': 650, 'Oppo Reno 11 Pro': 280, 'Oppo Reno 10 Pro+': 300, 'Oppo Find X5 Pro': 340, 'Oppo Reno 8': 170, 'Oppo A78': 130, 'Oppo A58': 100, 'Oppo F23 Pro': 140, 'Oppo Reno 7': 120,
+            'Moto Edge 50 Pro': 350, 'Moto Razr 40 Ultra': 480, 'Moto Edge 40': 270, 'Moto G84 5G': 160, 'Moto G54 5G': 120, 'Moto Edge 30 Ultra': 310, 'Moto G73': 130, 'Moto One 5G': 90, 'Moto G62': 80, 'Moto E13': 45,
+            'Vivo X100 Pro': 580, 'Vivo X90 Pro': 450, 'Vivo V30 Pro': 310, 'Vivo V29': 240, 'Vivo X80 Pro': 330, 'Vivo T2 Pro': 150, 'Vivo Y200': 130, 'Vivo V27': 200, 'Vivo Y100': 110, 'Vivo Y35': 80,
+            'Poco F6 Pro': 380, 'Poco X6 Pro': 290, 'Poco X6': 210, 'Poco F5': 260, 'Poco X5 Pro': 190, 'Poco M6 Pro': 130, 'Poco C65': 70, 'Poco F4 GT': 220, 'Poco X4 Pro': 140, 'Poco M5': 80,
+            'OnePlus 12': 550, 'OnePlus 12R': 410, 'OnePlus Open': 700, 'OnePlus 11': 430, 'OnePlus 11R': 320, 'OnePlus 10 Pro': 280, 'OnePlus 10T': 250, 'OnePlus Nord 3': 210, 'OnePlus Nord CE 3': 160, 'OnePlus 9 Pro': 200,
+            'Nothing Phone (2)': 350, 'Nothing Phone (1)': 200, 'Nothing Phone (2a)': 230, 'Nothing Ear (2)': 60, 'Nothing Ear (open)': 70, 'Nothing Phone (2) Special': 380, 'Nothing Phone (1) Alpha': 190, 'Nothing Concept 1': 150, 'Nothing OS Edition': 120, 'Nothing Watch Pro': 50
+        };
+
+        const brandSel = document.getElementById('brand-sel');
+        const modelSel = document.getElementById('model-sel');
+
+        brandSel.addEventListener('change', e => {
+            data.brand = e.target.value;
+            data.model = '';
+            modelSel.innerHTML = '<option value="" disabled selected>-- Select Model --</option>';
+            if (catalog[data.brand]) {
+                catalog[data.brand].forEach(m => {
+                    let opt = document.createElement('option');
+                    opt.value = m; opt.textContent = m;
+                    modelSel.appendChild(opt);
+                });
+            }
+        });
+
+        modelSel.addEventListener('change', e => {
+            data.model = e.target.value;
+            data.base = prices[data.model] || 300;
+        });
+
+        function selectOpt(el, type, val, bonus) {
+            Array.from(el.parentNode.children).forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            if (type === 'storage') { data.storage = val; data.bonus = bonus; }
+            if (type === 'years') { data.ageYears = val; data.ageAdjustment = bonus; }
+            if (type === 'screen') data.screen = val;
+            if (type === 'body') data.body = val;
+        }
+
+        function formatCurrency(usd) {
+            let inr = usd * conversionRate;
+            return `$${usd} (₹${inr.toLocaleString('en-IN')})`;
+        }
+
+        function formatSignedCurrency(usd) {
+            let inr = Math.abs(usd) * conversionRate;
+            let sign = usd >= 0 ? '+' : '-';
+            return `${sign}$${Math.abs(usd)} (${sign}₹${inr.toLocaleString('en-IN')})`;
+        }
+
+        function navigate(dir) {
+            if (dir === 1) {
+                if (step === 1 && (!data.brand || !data.model || !data.storage)) {
+                    alert('Please select a valid manufacturer brand, model, and storage configuration.'); return;
+                }
+                if (step === 2 && !data.ageYears) {
+                    alert('Please select how many years you have used this phone.'); return;
+                }
+                if (step === 3 && (data.screen === -1 || data.body === -1)) {
+                    alert('Please select condition ratings for both screen integrity and body housing.'); return;
+                }
+            }
+            step += dir;
+            if (step > maxSteps) step = maxSteps;
+            if (step < 1) step = 1;
+            updateView();
+        }
+
+        function updateView() {
+            for (let i = 1; i <= maxSteps; i++) {
+                document.getElementById('step-' + i).classList.add('hidden');
+            }
+            document.getElementById('step-' + step).classList.remove('hidden');
+
+            let pct = Math.round((step / maxSteps) * 100);
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-pct').textContent = pct + '%';
+            
+            const titles = ['Device Information', 'Usage Duration', 'Condition Assessment', 'Specification Records', 'Valuation Rules Engine', 'Offer Generation', 'Customer Acceptance'];
+            document.getElementById('step-title').textContent = `Step ${step} of ${maxSteps}: ${titles[step - 1]}`;
+
+            document.getElementById('btn-back').classList.toggle('hidden', step === 1);
+            let navFooter = document.getElementById('nav-footer');
+
+            if (step === 5) {
+                navFooter.classList.add('hidden');
+                runEngine();
+            } else if (step === 6) {
+                document.getElementById('btn-next').textContent = 'Accept & Proceed';
+                navFooter.classList.remove('hidden');
+            } else if (step === 7) {
+                navFooter.classList.add('hidden');
+            } else {
+                document.getElementById('btn-next').textContent = 'Continue';
+                navFooter.classList.remove('hidden');
+            }
+        }
+
+        function runEngine() {
+            let loader = document.getElementById('loader');
+            let results = document.getElementById('results');
+            loader.classList.remove('hidden');
+            results.classList.add('hidden');
+
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                results.classList.remove('hidden');
+
+                let totalDeduct = data.screen + data.body;
+                let finalUsd = Math.max(30, data.base + data.bonus + data.ageAdjustment - totalDeduct);
+
+                document.getElementById('r-base').textContent = formatCurrency(data.base);
+                document.getElementById('r-storage').textContent = formatSignedCurrency(data.bonus);
+                document.getElementById('r-deduct').textContent = formatSignedCurrency(-(totalDeduct - data.ageAdjustment));
+                document.getElementById('r-final').textContent = formatCurrency(finalUsd);
+
+                document.getElementById('offer-price').textContent = formatCurrency(finalUsd);
+                document.getElementById('offer-device').textContent = `${data.brand} ${data.model} (${data.storage}, Used ${data.ageYears})`;
+
+                setTimeout(() => { step = 6; updateView(); }, 1200);
+            }, 600);
+        }
+
+        function resetAll() {
+            step = 1;
+            data = { brand: '', model: '', storage: '', bonus: 0, ageYears: '', ageAdjustment: 0, screen: -1, body: -1, base: 0 };
+            brandSel.selectedIndex = 0;
+            modelSel.innerHTML = '<option value="" disabled selected>-- Select brand first --</option>';
+            document.querySelectorAll('.option-box').forEach(b => b.classList.remove('selected'));
+            document.getElementById('nav-footer').classList.remove('hidden');
+            updateView();
+        }
+    </script>
+</body>
+</html>
